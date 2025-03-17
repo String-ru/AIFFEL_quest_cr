@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // 추가된 부분
+import 'package:shared_preferences/shared_preferences.dart';
 import 'weather_service.dart';
 
+// 즐겨찾기 해놓은 도시 목록 화면
 class FavoritesScreen extends StatefulWidget {
   @override
   _FavoritesScreenState createState() => _FavoritesScreenState();
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  List<String> favoriteCities = []; // 즐겨찾기 도시 목록
+  List<String> favoriteCities = []; // 즐겨찾기 목록
 
   @override
   void initState() {
     super.initState();
-    _loadFavoriteCities(); // 앱이 시작될 때 즐겨찾기 도시 목록을 불러옴
+    _loadFavoriteCities(); // 즐겨찾기 불러오기
   }
 
-  // 즐겨찾기 도시 목록을 SharedPreferences에서 불러오는 함수
+  // 즐겨찾기 불러오는 함수
   void _loadFavoriteCities() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -24,7 +25,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     });
   }
 
-  // 즐겨찾기 도시 목록을 SharedPreferences에 저장하는 함수
+  // 즐겨찾기 저장하는 함수
   void _saveFavoriteCities() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList('favoriteCities', favoriteCities);
@@ -38,7 +39,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: _showAddCityDialog,
+            onPressed: _showAddCityDialog, // 도시 추가 다이얼로그
           ),
         ],
       ),
@@ -47,10 +48,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(favoriteCities[index]),
-            onTap: () => _showWeatherForCity(favoriteCities[index]),
+            onTap: () => _showWeatherForCity(favoriteCities[index]), // 선택한 도시의 날씨 data 보기
             trailing: IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () => _removeCity(index),
+              onPressed: () => _removeCity(index), // 삭제
             ),
           );
         },
@@ -58,7 +59,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     );
   }
 
-  // 도시 추가 다이얼로그
+  // 도시 추가 다이얼로그 표시 함수
   void _showAddCityDialog() {
     final TextEditingController _cityController = TextEditingController();
     showDialog(
@@ -68,15 +69,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           title: Text('도시 추가'),
           content: TextField(
             controller: _cityController,
-            decoration: InputDecoration(
-              labelText: '도시 이름',
-            ),
+            decoration: InputDecoration(labelText: '도시 이름'),
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               child: Text('취소'),
             ),
             TextButton(
@@ -86,7 +83,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   setState(() {
                     favoriteCities.add(city);
                   });
-                  _saveFavoriteCities(); // 도시 추가 후 저장
+                  _saveFavoriteCities(); // 즐겨찾기 목록 저장
                   Navigator.pop(context);
                 }
               },
@@ -98,15 +95,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     );
   }
 
-  // 즐겨찾기에서 도시 삭제
+  // 삭제
   void _removeCity(int index) {
     setState(() {
       favoriteCities.removeAt(index);
     });
-    _saveFavoriteCities(); // 도시 삭제 후 저장
+    _saveFavoriteCities();
   }
 
-  // 날씨 화면으로 이동
+  // 선택한 도시의 날씨 data 화면으로 이동하는 함수
   void _showWeatherForCity(String city) {
     Navigator.push(
       context,
@@ -117,6 +114,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 }
 
+// 날씨 data 표시
 class WeatherScreen extends StatefulWidget {
   final String cityName;
 
@@ -127,8 +125,8 @@ class WeatherScreen extends StatefulWidget {
 }
 
 class _WeatherScreenState extends State<WeatherScreen> {
-  Future<Map<String, dynamic>>? _weatherFuture;
-  String? _errorMessage;
+  Future<Map<String, dynamic>>? _weatherFuture; // 날씨 data 저장하는 Future 객체
+  String? _errorMessage; // 오류 메시지
 
   @override
   void initState() {
@@ -136,7 +134,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
     _fetchWeather();
   }
 
-  Future<void> _fetchWeather() async {
+  // 날씨 data 불러오는 함수
+  Future<void> _fetchWeather() async { // 날씨 data 가져오기
     setState(() {
       _weatherFuture = WeatherService.getWeather(widget.cityName).catchError((error) {
         setState(() {
@@ -144,6 +143,33 @@ class _WeatherScreenState extends State<WeatherScreen> {
         });
       });
     });
+  }
+
+  //기온에 따른 옷 추천
+  String _getClothingRecommendation(double temp) {
+    if (temp <= -13) {
+      return '엄청 추워요. 롱패딩, 목도리, 장갑을 추천드려요. 히트텍과 핫팩은 필수!';
+    } else if (temp > -13 && temp <= -8) {
+      return '많이 추워요. 롱패딩, 터틀넥, 기모제품을 추천해요. 핫팩 챙기는 센스!';
+    } else if (temp > -8 && temp <= -1) {
+      return '꽤 추워요. 롱패딩, 두꺼운 니트, 기모제품을 추천해요.';
+    } else if (temp > -1 && temp <= 5) {
+      return '추워요. 숏패딩, 터틀넥, 기모제품을 추천해요.';
+    } else if (temp > 5 && temp <= 9) {
+      return '날이 쌀쌀해요. 코트, 울니트, 청바지, 가죽자켓을 추천해요.';
+    } else if (temp > 9 && temp <= 11) {
+      return '공기가 서늘해요. 트렌치코트, 맨투맨, 청바지를 추천해요.';
+    } else if (temp > 11 && temp <= 16) {
+      return '자켓, 야상, 면니트, 청바지를 추천해요. 가디건 입기 좋은 날씨!';
+    } else if (temp > 16 && temp <= 19) {
+      return '면니트, 맨투맨, 청바지를 추천해요.';
+    } else if (temp > 19 && temp <= 22) {
+      return '날이 따뜻해요. 긴팔티, 청바지, 면바지를 추천해요.';
+    } else if (temp > 22 && temp <= 27) {
+      return '조금 더울 수 있어요. 반팔티, 반바지, 운동화를 추천해요. 셔츠 입기 좋은 날씨!';
+    } else {
+      return '많이 더워요. 반팔티, 민소매, 반바지, 샌들을 추천해요.';
+    }
   }
 
   @override
@@ -175,15 +201,21 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   }
 
                   final weatherData = snapshot.data!;
+                  final temp = weatherData['temp'];
+                  final clothingRecommendation = _getClothingRecommendation(temp);
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('도시: ${widget.cityName}', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                      Text('현재 온도: ${weatherData['temp']}°C'),
+                      Text('현재 온도: ${temp}°C'),
                       Text('체감 온도: ${weatherData['feels_like']}°C'),
                       Text('바람 속도: ${weatherData['wind_speed']} m/s'),
                       Text('강수량: ${weatherData['rain']} mm'),
                       Text('날씨 상태: ${weatherData['weather_description']}'),
+                      SizedBox(height: 20),
+                      Text('👕 의상 추천: $clothingRecommendation',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
                     ],
                   );
                 },
