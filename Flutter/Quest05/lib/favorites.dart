@@ -127,6 +127,7 @@ class WeatherScreen extends StatefulWidget {
 class _WeatherScreenState extends State<WeatherScreen> {
   Future<Map<String, dynamic>>? _weatherFuture; // 날씨 data 저장하는 Future 객체
   String? _errorMessage; // 오류 메시지
+  Color _backgroundColor = Colors.white; // 배경색 변수
 
   @override
   void initState() {
@@ -143,6 +144,33 @@ class _WeatherScreenState extends State<WeatherScreen> {
         });
       });
     });
+  }
+
+  //기온에 따른 배경색을 설정하는 함수
+  void _updateBackgroundColor(double temp) {
+    if (temp <= -13) {
+      _backgroundColor = Colors.blue.shade900; // 매우 추운 날씨
+    } else if (temp > -13 && temp <= -8) {
+      _backgroundColor = Colors.blue.shade700; // 추운 날씨
+    } else if (temp > -8 && temp <= -1) {
+      _backgroundColor = Colors.blue.shade400; // 꽤 추운 날씨
+    } else if (temp > -1 && temp <= 5) {
+      _backgroundColor = Colors.blue.shade200; // 조금 추운 날씨
+    } else if (temp > 5 && temp <= 9) {
+      _backgroundColor = Colors.green.shade200; // 쌀쌀한 날씨
+    } else if (temp > 9 && temp <= 11) {
+      _backgroundColor = Colors.green.shade400; // 서늘한 날씨
+    } else if (temp > 11 && temp <= 16) {
+      _backgroundColor = Colors.orange.shade300; // 따뜻한 날씨
+    } else if (temp > 16 && temp <= 19) {
+      _backgroundColor = Colors.orange.shade500; // 맑고 따뜻한 날씨
+    } else if (temp > 19 && temp <= 22) {
+      _backgroundColor = Colors.orange.shade700; // 좀 더운 날씨
+    } else if (temp > 22 && temp <= 27) {
+      _backgroundColor = Colors.red.shade400; // 더운 날씨
+    } else {
+      _backgroundColor = Colors.red.shade700; // 매우 더운 날씨
+    }
   }
 
   //기온에 따른 옷 추천
@@ -178,50 +206,54 @@ class _WeatherScreenState extends State<WeatherScreen> {
       appBar: AppBar(title: Text('${widget.cityName} 날씨')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _fetchWeather,
-              child: Text('새로고침'),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: FutureBuilder<Map<String, dynamic>>(
-                future: _weatherFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError || _errorMessage != null) {
-                    return Center(
-                      child: Text(_errorMessage ?? '데이터를 불러오지 못했습니다.'),
-                    );
-                  } else if (!snapshot.hasData) {
-                    return Center(child: Text('날씨 데이터를 가져올 수 없습니다.'));
-                  }
-
-                  final weatherData = snapshot.data!;
-                  final temp = weatherData['temp'];
-                  final clothingRecommendation = _getClothingRecommendation(temp);
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('도시: ${widget.cityName}', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                      Text('현재 온도: ${temp}°C'),
-                      Text('체감 온도: ${weatherData['feels_like']}°C'),
-                      Text('바람 속도: ${weatherData['wind_speed']} m/s'),
-                      Text('강수량: ${weatherData['rain']} mm'),
-                      Text('날씨 상태: ${weatherData['weather_description']}'),
-                      SizedBox(height: 20),
-                      Text('👕 의상 추천: $clothingRecommendation',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
-                    ],
-                  );
-                },
+        child: Container(
+          color: _backgroundColor, // 배경색 변경
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: _fetchWeather,
+                child: Text('새로고침'),
               ),
-            ),
-          ],
+              SizedBox(height: 20),
+              Expanded(
+                child: FutureBuilder<Map<String, dynamic>>(
+                  future: _weatherFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError || _errorMessage != null) {
+                      return Center(
+                        child: Text(_errorMessage ?? '데이터를 불러오지 못했습니다.'),
+                      );
+                    } else if (!snapshot.hasData) {
+                      return Center(child: Text('날씨 데이터를 가져올 수 없습니다.'));
+                    }
+
+                    final weatherData = snapshot.data!;
+                    final temp = weatherData['temp'];
+                    _updateBackgroundColor(temp); // 기온에 따라 배경색 업데이트
+                    final clothingRecommendation = _getClothingRecommendation(temp);
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('도시: ${widget.cityName}', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                        Text('현재 온도: ${temp}°C'),
+                        Text('체감 온도: ${weatherData['feels_like']}°C'),
+                        Text('바람 속도: ${weatherData['wind_speed']} m/s'),
+                        Text('강수량: ${weatherData['rain']} mm'),
+                        Text('날씨 상태: ${weatherData['weather_description']}'),
+                        SizedBox(height: 20),
+                        Text('👕 의상 추천: $clothingRecommendation',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

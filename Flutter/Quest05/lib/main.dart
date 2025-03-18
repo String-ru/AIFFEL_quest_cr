@@ -1,3 +1,5 @@
+// 1차 최종본
+
 import 'package:flutter/material.dart';
 import 'weather_service.dart';
 import 'favorites.dart';
@@ -76,6 +78,15 @@ class _WeatherScreenState extends State<WeatherScreen> {
     }
   }
 
+  // 기온에 따른 배경색 설정
+  Color _getBackgroundColor(double temperature) {
+    if (temperature < 0) {
+      return Color.lerp(Colors.blue, Colors.white, -temperature / 30)!; // 낮은 온도일수록 점진적으로 파란색
+    } else {
+      return Color.lerp(Colors.white, Colors.red, temperature / 40)!; // 높은 온도일수록 점진적으로 붉은색
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,18 +145,24 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   final temperature = weatherData['temp'];
                   _outfitRecommendation = _getOutfitRecommendation(temperature); // 온도에 따른 의상 추천
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('도시: $_cityName', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                      Text('현재 온도: ${weatherData['temp']}°C'),
-                      Text('체감 온도: ${weatherData['feels_like']}°C'),
-                      Text('바람 속도: ${weatherData['wind_speed']} m/s'),
-                      Text('강수량: ${weatherData['rain']} mm'),
-                      Text('날씨 상태: ${weatherData['weather_description']}'),
-                      SizedBox(height: 20),
-                      Text('추천 의상: $_outfitRecommendation', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    ],
+                  // 배경색 설정
+                  final backgroundColor = _getBackgroundColor(temperature);
+
+                  return Container(
+                    color: backgroundColor,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('도시: $_cityName', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                        Text('현재 온도: ${weatherData['temp']}°C'),
+                        Text('체감 온도: ${weatherData['feels_like']}°C'),
+                        Text('바람 속도: ${weatherData['wind_speed']} m/s'),
+                        Text('강수량: ${weatherData['rain']} mm'),
+                        Text('날씨 상태: ${weatherData['weather_description']}'),
+                        SizedBox(height: 20),
+                        Text('추천 의상: $_outfitRecommendation', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   );
                 },
               ),

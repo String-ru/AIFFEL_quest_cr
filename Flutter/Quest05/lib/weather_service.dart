@@ -2,7 +2,7 @@ import 'dart:convert'; // JSON data 다루는 라이브러리
 import 'package:http/http.dart' as http; // HTTP 요청 위한 패키지
 
 class WeatherService {
-  static const String _apiKey = '16b1dd961c790fd8b482333446b237b0';
+  static const String _apiKey = '16b1dd961c790fd8b482333446b237b0'; // 외부 API 연동 (OpenWeather)
   static const String _baseUrl = 'https://api.openweathermap.org/data/2.5/weather';
 
   // 특정 도시 날씨 data 가져오는 함수
