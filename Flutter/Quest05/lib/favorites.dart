@@ -1,3 +1,13 @@
+// 최종본
+// 최종본에 대한 회고 (favorites.dart를 작성하며)
+// FavoritesScreen(즐겨찾기 목록)과 WeatherScreen(날씨 표시 화면)을
+// 두 개의 StatefulWidget으로 분리하여 코드의 가독성을 높였습니다.
+// 즐겨찾기 화면을 떠났을 때 다시 돌아오면 즐겨찾기 목록이 저장되지 않는 오류가 있었습니다.
+// favoriteCities 리스트가 앱을 재시작하거나 화면을 전환할 때 메모리 상에만 존재하고, 로컬 저장소에 저장하지 않았던 문제였습니다.
+// SharedPreferences를 사용하여 선택한 도시를 로컬에 저장하고 불러오는 기능을 구현했습니다.
+// 이를 통해 앱을 종료하고 다시 열어도 즐겨찾기 도시 목록이 유지됐습니다.
+// 추가적으로 더 나은 UX/UI 디자인을 고려해보고 싶습니다.
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'weather_service.dart';
@@ -247,7 +257,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         SizedBox(height: 20),
                         Text('👕 의상 추천: $clothingRecommendation',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
-                      ],
+                      ], // 배경색과 글자색이 겹쳐서 안 보이지 않도록 글자색을 black으로 설정
                     );
                   },
                 ),

@@ -1,4 +1,18 @@
-// 1차 최종본
+// 최종본
+// 검색에 번역 기능 넣는 것은 아쉽게도 실패 - 이것에 대한 회고는 mistakes.dart에 적었습니다.
+// 최종본에 대한 회고 (main.dart를 작성하며)
+// FutureBuilder를 사용할 때 snapshot.hasError와 _errorMessage 처리를 꼭 동시에 고려해야 한다는 점을 배웠습니다.
+// catchError를 사용할 때 setState를 적절히 감싸지 않으면 상태 관리가 꼬일 수 있다는 점을 알게 되었습니다.
+// Color.lerp를 활용해 온도에 따른 배경색을 자연스럽게 변하게 하는 로직을 구현했던 것이 디자인적인 면에서 인상깊었습니다.
+// 검색 기능을 추가하면서 TextEditingController를 초기화하지 않으면 이전 입력값이 남아 있을 수 있다는 점도 기억에 남습니다.
+// 오류가 생겼던 코드
+// Text('최고 / 최저 기온: ${weatherData['temp_max']}°C / ${weatherData['temp_min']}°C'),
+// Text('어제와의 기온 차이: ${weatherData['temp'] - weatherData['yesterday_temp']}°C'),
+// api를 통해 불러올 수 있는 data의 디테일함에 한계가 있었습니다.
+// 실제 하루의 최고 최저 기온과 어제와의 기온 차이를 표시하기에는 시간과 실력이 부족했습니다.
+//  final airQualityData = await _weatherService.fetchAirQuality(lat, lon);
+// 미세먼지도 표시하려고 했으나 유사한 문제로 인해 포기했습니다.
+
 
 import 'package:flutter/material.dart';
 import 'weather_service.dart';
