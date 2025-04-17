@@ -1,6 +1,6 @@
 # AIFFEL Campus Online Code Peer Review Templete
-- 코더 : 코더의 이름을 작성하세요.
-- 리뷰어 : 리뷰어의 이름을 작성하세요.
+- 코더 : 변종현, 류지호
+- 리뷰어 : 안진용, 민유경, 윤경석
 
 🤔 피어리뷰 템플릿
 
